@@ -67,87 +67,87 @@
 40, 100 ; write 100 to reg 40
 10	; wait 10 frames
 2
-40, 200 ; write 100 to reg 40
-41, 210 ; write 100 to reg 40
+40, 200
+41, 210
 10
 2
-40, 250 ; write 100 to reg 40
-41, 100 ; write 100 to reg 40
+40, 250
+41, 100
 10
 2
-40, 250 ; write 100 to reg 40
-41, 200 ; write 100 to reg 40
+40, 250
+41, 200
 10
 2
-40, 200 ; write 100 to reg 40
-41, 210 ; write 100 to reg 40
+40, 200
+41, 210
 10
 2
-40, 250 ; write 100 to reg 40
-41, 100 ; write 100 to reg 40
+40, 250
+41, 100
 10
 2
-40, 250 ; write 100 to reg 40
-41, 200 ; write 100 to reg 40
+40, 250
+41, 200
 10
 2
-40, 200 ; write 100 to reg 40
-41, 210 ; write 100 to reg 40
+40, 200
+41, 210
 10
 2
-40, 250 ; write 100 to reg 40
-41, 100 ; write 100 to reg 40
+40, 250
+41, 100
 10
 2
-40, 250 ; write 100 to reg 40
-41, 200 ; write 100 to reg 40
+40, 250
+41, 200
 10
 2
-40, 200 ; write 100 to reg 40
-41, 210 ; write 100 to reg 40
+40, 200
+41, 210
 10
 2
-40, 250 ; write 100 to reg 40
-41, 100 ; write 100 to reg 40
+40, 250
+41, 100
 10
 2
-40, 250 ; write 100 to reg 40
-41, 200 ; write 100 to reg 40
+40, 250
+41, 200
 10
 2
-40, 200 ; write 100 to reg 40
-41, 210 ; write 100 to reg 40
+40, 200
+41, 210
 10
 2
-40, 250 ; write 100 to reg 40
-41, 100 ; write 100 to reg 40
+40, 250
+41, 100
 10
 2
-40, 250 ; write 100 to reg 40
-41, 200 ; write 100 to reg 40
+40, 250
+41, 200
 10
 2
-40, 200 ; write 100 to reg 40
-41, 210 ; write 100 to reg 40
+40, 200
+41, 210
 10
 2
-40, 250 ; write 100 to reg 40
-41, 100 ; write 100 to reg 40
+40, 250
+41, 100
 10
 2
-40, 250 ; write 100 to reg 40
-41, 200 ; write 100 to reg 40
+40, 250
+41, 200
 10
 2
-40, 200 ; write 100 to reg 40
-41, 210 ; write 100 to reg 40
+40, 200
+41, 210
 10
 2
-40, 250 ; write 100 to reg 40
-41, 100 ; write 100 to reg 40
+40, 250
+41, 100
 10
 2
-40, 250 ; write 100 to reg 40
-41, 200 ; write 100 to reg 40
+40, 250
+41, 200
 10
 0
