@@ -19,7 +19,7 @@ Noticed the -mode flag.  This can be set to hex or dec to read in numbers as eit
 Running make should generate the PLAYER.PRG and MUSIC.SP files needed to run this in the X16 emulator.  This should work on any build of the emulator that has sound included.
 >make
 
-There are additional options in the makefile to make things easier.  If you have the emulator in a folder called bin located in the parent directory of the player, the following will work.
+There are additional options in the makefile to make things easier.  If you have the emulator in a folder called bin located in the parent directory of the player, the following will work to run the player.
 >make run
 
 ## File format
