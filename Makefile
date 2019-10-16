@@ -11,6 +11,9 @@ MUSIC.SP: music.spt
 run: all
 	$(X16EMU_PATH)/x16emu -prg PLAYER.PRG -run
 
+debug: all
+	$(X16EMU_PATH)/x16emu -prg PLAYER.PRG -run -debug
+
 
 start: all
 	$(X16EMU_PATH)/x16emu -prg PLAYER.PRG
