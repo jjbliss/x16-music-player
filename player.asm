@@ -1,9 +1,5 @@
 !to "PLAYER.PRG", cbm
 
-
-;!src "vera.inc"
-;!src "system.inc"
-;!src "math.inc"
 !src "macros.inc"
 
 *=$0801
@@ -15,10 +11,10 @@
 Z0 = $00
 Z1 = $01
 
-;Addres storage registers
-A0 = $50
-A1 = $52
-A2 = $54
+;Address storage registers
+A0 = $10
+A1 = $12
+A2 = $14
 
 ;Sound
 MUSIC_COUNTER = $70 ; and $71
@@ -26,6 +22,8 @@ MUSIC_POINTER = $72 ; and $73
 MUSIC_ON = $74
 YM2151_REG = $9fe0
 YM2151_DATA = $9fe1
+
+;Memory
 HIGH_RAM = $A000
 MEMORY_BANK = $9F61
 
@@ -150,7 +148,8 @@ reset_sound:
 .reset_end:
 	rts
 
-
+;A1 should be pointing to filename
+;A2 should be pointing to filename length
 load_from_file_to_highram:
 	;$FFBA: SETLFS – set LA, FA and SA
 	lda #0 ; logical number (?)
@@ -183,4 +182,4 @@ music_filename:
 	!pet "music.sp"
 
 irq_redirect:
-	!byte $00, $00
+	!fill 2
