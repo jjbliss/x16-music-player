@@ -1,3 +1,5 @@
+X16EMU_PATH  := $(PWD)/../bin
+
 all: PLAYER.PRG MUSIC.SP
 
 PLAYER.PRG: player.asm
@@ -7,11 +9,11 @@ MUSIC.SP: music.spt
 	python3 spconvert.py -i music.spt -o MUSIC.SP -mode dec
 
 run: all
-	../bin/x16emu -prg PLAYER.PRG -run
+	$(X16EMU_PATH)/x16emu -prg PLAYER.PRG -run
 
 
 start: all
-	../bin/x16emu -prg PLAYER.PRG
+	$(X16EMU_PATH)/x16emu -prg PLAYER.PRG
 
 
 clean:
