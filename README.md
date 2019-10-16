@@ -5,8 +5,8 @@ Simple way to try out the YM2151 sound chip on the X16
 ## What it does
 This is an X16 program "PLAYER.PRG" that will play music from a file called MUSIC.SP.
 Currently, MUSIC.SP is loaded into one bank of high ram, so the maximum supported file size is 8KB.
-To run the player you can do the following while inserting the location to your x16 emulator.
-> /path/to/x16emu -prg PLAYER.PRG -run
+To run the player you can do the following.
+> x16emu -prg PLAYER.PRG -run
 
 Also included is a python script spconvert.py.  This script converts a human readable text file, such as the included music.spt file, into a file that can be read by PLAYER.PRG.  
 Here is a command to convert the included music.spt to MUSIC.SP
