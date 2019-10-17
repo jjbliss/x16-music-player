@@ -61,7 +61,7 @@ setup_done:
     lda MUSIC_ON
     beq .end_program
     jsr wait
-    jsr ym_write
+	jsr ym_write
     jmp setup_done
 
 .end_program:
