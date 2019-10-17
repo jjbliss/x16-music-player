@@ -29,8 +29,8 @@ DELAY_AMOUNT = 1
 
 ;Ring Buffer
 RINGBUFFER = $0500 ; choose a page of memory that is dedicated as a ring buffer
-RB_HEAD = $15
-RB_TAIL = $16
+RB_HEAD = $20
+RB_TAIL = $21
 
 ;Memory
 HIGH_RAM = $A000
@@ -62,24 +62,20 @@ setup:
 setup_done:
 	lda MUSIC_ON
 	beq .end_program
-  ldy #DELAY_AMOUNT
-.busy_loop:
-  nop
-  dey
-  bne .busy_loop
+  jsr wait
   jsr ym_write
 	jmp setup_done
 
 .end_program:
 	rts
-;
-; wait:
-;   ldy #DELAY_AMOUNT
-; .busy_loop:
-;   nop
-;   dey
-;   bne .busy_loop
-;   rts
+
+wait:
+  ldy #DELAY_AMOUNT
+.busy_loop:
+  nop
+  dey
+  bne .busy_loop
+  rts
 
 ;=================================================
 ; irq_handler
@@ -159,11 +155,7 @@ next_music:
 reset_sound:
   ldx #0
 .reset_loop:
-  ldy #DELAY_AMOUNT
-.reset_busy_loop:
-  nop
-  dey
-  bne .reset_busy_loop
+  jsr wait
   stx YM2151_REG
   nop ; real HW fails if you immediately write DATA after ADDRESS
   stz YM2151_DATA
@@ -177,10 +169,10 @@ ym_write:
   ldx RB_HEAD
   cpx RB_TAIL
   beq .ym_write_done
-;   lda #$80
-; .ym_wait:
-;   and YM2151_DATA
-;   bne .ym_wait
+  lda #$80
+.ym_wait:
+  and YM2151_DATA
+  bne .ym_wait
   lda RINGBUFFER,X
   sta YM2151_REG
   inx
@@ -191,6 +183,7 @@ ym_write:
 .ym_write_done:
   rts
 
+;Will add Z2 and Z3 to buffer
 ym_add_buffer:
   lda RB_TAIL
   clc
