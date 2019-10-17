@@ -25,7 +25,7 @@ MUSIC_ON = $74
 YM2151_REG = $9fe0
 YM2151_DATA = $9fe1
 
-DELAY_AMOUNT = 1
+DELAY_AMOUNT = $20
 
 ;Ring Buffer
 RINGBUFFER = $0500 ; choose a page of memory that is dedicated as a ring buffer
