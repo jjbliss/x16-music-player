@@ -116,8 +116,26 @@
 
 !macro INC_MUSIC_POINTER {
 	+ADD_TO_16 MUSIC_POINTER, 1
-	bcc .imp_end
+	lda MUSIC_POINTER+1
+	cmp #$C0
+	bne .imp_end
 	inc MEMORY_BANK
+	lda #$A0
+	sta MUSIC_POINTER+1
 .imp_end:
 
+}
+
+;Utility macros
+
+!macro BEQ_LONG .lbl {
+	bne .bel1
+	jmp	.lbl
+.bel1:
+}
+
+!macro BNE_LONG .lbl {
+	beq .bel1
+	jmp	.lbl
+.bel1:
 }

@@ -107,28 +107,27 @@ music_setup:
 	+SYS_WRITE_16 MUSIC_POINTER, HIGH_RAM
 	lda #1
 	sta MUSIC_ON
-
 	;load file
 	+SYS_WRITE_16 A1, music_filename
 	+SYS_WRITE_16 A2, (music_filename - 1)
 	jsr load_from_file_to_highram
+	stz MEMORY_BANK
 	rts
 
 next_music:
 	lda MUSIC_ON
-	beq .nm_done
+	+BEQ_LONG .nm_done
 	lda MUSIC_COUNTER
-	bne .wait
-	ldy #0
-	lda (MUSIC_POINTER),y
-	beq .nm_done
+	+BNE_LONG .wait
+	lda (MUSIC_POINTER)
+	+BEQ_LONG .nm_done
 	sta Z0 ; number of commands to read
 .nm_loop:
 	+INC_MUSIC_POINTER
-	lda (MUSIC_POINTER),y
+	lda (MUSIC_POINTER)
 	sta Z2
 	+INC_MUSIC_POINTER
-	lda (MUSIC_POINTER),y
+	lda (MUSIC_POINTER)
 	sta Z3
 	jsr ym_add_buffer
 
@@ -136,7 +135,7 @@ next_music:
 	lda Z0
 	bne .nm_loop
 	+INC_MUSIC_POINTER
-	lda (MUSIC_POINTER),y
+	lda (MUSIC_POINTER)
 	sta MUSIC_COUNTER
 	+INC_MUSIC_POINTER
 	rts
