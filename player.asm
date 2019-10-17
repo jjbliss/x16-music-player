@@ -3,7 +3,7 @@
 !src "macros.inc"
 
 *=$0801
-    !byte $0b,$08,$01,$00,$9e,$32,$30,$36,$31,$00,$00,$00
+	!byte $0b,$08,$01,$00,$9e,$32,$30,$36,$31,$00,$00,$00
 
 
 ;ZeroPage registers
@@ -51,18 +51,18 @@ SETNAM = $FFBD
 ;
 ;-------------------------------------------------
 setup:
-    +SYS_SET_IRQ irq_handler
-    +VERA_ENABLE_IRQ
-    cli
-    jsr music_setup
+	+SYS_SET_IRQ irq_handler
+	+VERA_ENABLE_IRQ
+	cli
+	jsr music_setup
 
 
 setup_done:
-    lda MUSIC_ON
-    beq .end_program
-    jsr wait
+	lda MUSIC_ON
+	beq .end_program
+	jsr wait
 	jsr ym_write
-    jmp setup_done
+	jmp setup_done
 
 .end_program:
 	rts
@@ -124,22 +124,22 @@ next_music:
 	beq .nm_done
 	sta Z0 ; number of commands to read
 .nm_loop:
-    +ADD_TO_16 MUSIC_POINTER, 1
-    lda (MUSIC_POINTER),y
-    sta Z2
-    +ADD_TO_16 MUSIC_POINTER, 1
-    lda (MUSIC_POINTER),y
-    sta Z3
-    jsr ym_add_buffer
+	+ADD_TO_16 MUSIC_POINTER, 1
+	lda (MUSIC_POINTER),y
+	sta Z2
+	+ADD_TO_16 MUSIC_POINTER, 1
+	lda (MUSIC_POINTER),y
+	sta Z3
+	jsr ym_add_buffer
 
-    dec Z0
-    lda Z0
-    bne .nm_loop
-    +ADD_TO_16 MUSIC_POINTER, 1
-    lda (MUSIC_POINTER),y
-    sta MUSIC_COUNTER
-    +ADD_TO_16 MUSIC_POINTER, 1
-    rts
+	dec Z0
+	lda Z0
+	bne .nm_loop
+	+ADD_TO_16 MUSIC_POINTER, 1
+	lda (MUSIC_POINTER),y
+	sta MUSIC_COUNTER
+	+ADD_TO_16 MUSIC_POINTER, 1
+	rts
 .wait:
 	dec MUSIC_COUNTER
 	rts
@@ -151,53 +151,53 @@ next_music:
 	rts
 
 reset_sound:
-    ldx #0
+	ldx #0
 .reset_loop:
-    jsr wait
-    stx YM2151_REG
-    nop ; real HW fails if you immediately write DATA after ADDRESS
-    stz YM2151_DATA
-    inx
-    bne .reset_loop
+	jsr wait
+	stx YM2151_REG
+	nop ; real HW fails if you immediately write DATA after ADDRESS
+	stz YM2151_DATA
+	inx
+	bne .reset_loop
 .reset_end:
-    rts
+	rts
 
 ; Ring Buffer
 ym_write:
-    ldx RB_HEAD
-    cpx RB_TAIL
-    beq .ym_write_done
-    lda #$80
+	ldx RB_HEAD
+	cpx RB_TAIL
+	beq .ym_write_done
+	lda #$80
 .ym_wait:
-    and YM2151_DATA
-    bne .ym_wait
-    lda RINGBUFFER,X
-    sta YM2151_REG
-    inx
-    lda RINGBUFFER,X
-    sta YM2151_DATA
-    inx
-    stx RB_HEAD
+	and YM2151_DATA
+	bne .ym_wait
+	lda RINGBUFFER,X
+	sta YM2151_REG
+	inx
+	lda RINGBUFFER,X
+	sta YM2151_DATA
+	inx
+	stx RB_HEAD
 .ym_write_done:
-    rts
+	rts
 
 ;Will add Z2 and Z3 to buffer
 ym_add_buffer:
-    lda RB_TAIL
-    clc
-    adc #2 ; check if ring buffer is full
-    cmp RB_HEAD
-    beq .ym_buffer_done
-    sta RB_TAIL
-    sbc #2
-    tax
-    lda Z2
-    sta RINGBUFFER,x
-    inx
-    lda Z3
-    sta RINGBUFFER,x
+	lda RB_TAIL
+	clc
+	adc #2 ; check if ring buffer is full
+	cmp RB_HEAD
+	beq .ym_buffer_done
+	sta RB_TAIL
+	sbc #2
+	tax
+	lda Z2
+	sta RINGBUFFER,x
+	inx
+	lda Z3
+	sta RINGBUFFER,x
 .ym_buffer_done:
-    rts
+	rts
 
 ;A1 should be pointing to filename
 ;A2 should be pointing to filename length
