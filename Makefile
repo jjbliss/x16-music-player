@@ -2,7 +2,7 @@ X16EMU_PATH  := $(PWD)/../bin
 
 all: PLAYER.PRG MUSIC.SP
 
-PLAYER.PRG: player.asm
+PLAYER.PRG: player.asm macros.inc
 	acme player.asm
 
 MUSIC.SP: music.spt
@@ -10,6 +10,9 @@ MUSIC.SP: music.spt
 
 run: all
 	$(X16EMU_PATH)/x16emu -prg PLAYER.PRG -run
+
+debug: all
+	$(X16EMU_PATH)/x16emu -prg PLAYER.PRG -run -debug
 
 
 start: all

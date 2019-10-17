@@ -1,15 +1,17 @@
 !to "PLAYER.PRG", cbm
-
+!cpu 65c02
 !src "macros.inc"
 
 *=$0801
-    !byte $0b,$08,$01,$00,$9e,$32,$30,$36,$31,$00,$00,$00
+	!byte $0b,$08,$01,$00,$9e,$32,$30,$36,$31,$00,$00,$00
 
 
 ;ZeroPage registers
 ;assume that these are very volatile
 Z0 = $00
 Z1 = $01
+Z2 = $02
+Z3 = $03
 
 ;Address storage registers
 A0 = $10
@@ -22,6 +24,13 @@ MUSIC_POINTER = $72 ; and $73
 MUSIC_ON = $74
 YM2151_REG = $9fe0
 YM2151_DATA = $9fe1
+
+DELAY_AMOUNT = $20
+
+;Ring Buffer
+RINGBUFFER = $0500 ; choose a page of memory that is dedicated as a ring buffer
+RB_HEAD = $20
+RB_TAIL = $21
 
 ;Memory
 HIGH_RAM = $A000
@@ -42,10 +51,8 @@ SETNAM = $FFBD
 ;
 ;-------------------------------------------------
 setup:
-
 	+SYS_SET_IRQ irq_handler
 	+VERA_ENABLE_IRQ
-
 	cli
 	jsr music_setup
 
@@ -53,9 +60,19 @@ setup:
 setup_done:
 	lda MUSIC_ON
 	beq .end_program
+	jsr wait
+	jsr ym_write
 	jmp setup_done
 
 .end_program:
+	rts
+
+wait:
+	ldy #DELAY_AMOUNT
+.busy_loop:
+	nop
+	dey
+	bne .busy_loop
 	rts
 
 ;=================================================
@@ -109,10 +126,11 @@ next_music:
 .nm_loop:
 	+ADD_TO_16 MUSIC_POINTER, 1
 	lda (MUSIC_POINTER),y
-	sta YM2151_REG
+	sta Z2
 	+ADD_TO_16 MUSIC_POINTER, 1
 	lda (MUSIC_POINTER),y
-	sta YM2151_DATA
+	sta Z3
+	jsr ym_add_buffer
 
 	dec Z0
 	lda Z0
@@ -132,20 +150,53 @@ next_music:
 	jsr reset_sound
 	rts
 
-
 reset_sound:
 	ldx #0
 .reset_loop:
-	txa
-	sta YM2151_REG
-	lda #0
-	sta YM2151_DATA
-	txa
-	clc
-	adc #1
-	tax
-	bcc .reset_loop
+	jsr wait
+	stx YM2151_REG
+	nop ; real HW fails if you immediately write DATA after ADDRESS
+	stz YM2151_DATA
+	inx
+	bne .reset_loop
 .reset_end:
+	rts
+
+; Ring Buffer
+ym_write:
+	ldx RB_HEAD
+	cpx RB_TAIL
+	beq .ym_write_done
+	lda #$80
+.ym_wait:
+	and YM2151_DATA
+	bne .ym_wait
+	lda RINGBUFFER,X
+	sta YM2151_REG
+	inx
+	lda RINGBUFFER,X
+	sta YM2151_DATA
+	inx
+	stx RB_HEAD
+.ym_write_done:
+	rts
+
+;Will add Z2 and Z3 to buffer
+ym_add_buffer:
+	lda RB_TAIL
+	clc
+	adc #2 ; check if ring buffer is full
+	cmp RB_HEAD
+	beq .ym_buffer_done
+	sta RB_TAIL
+	sbc #2
+	tax
+	lda Z2
+	sta RINGBUFFER,x
+	inx
+	lda Z3
+	sta RINGBUFFER,x
+.ym_buffer_done:
 	rts
 
 ;A1 should be pointing to filename
