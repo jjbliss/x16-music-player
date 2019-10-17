@@ -2,7 +2,7 @@ X16EMU_PATH  := $(PWD)/../bin
 
 all: PLAYER.PRG MUSIC.SP
 
-PLAYER.PRG: player.asm
+PLAYER.PRG: player.asm macros.inc
 	acme player.asm
 
 MUSIC.SP: music.spt
