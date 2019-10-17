@@ -4,7 +4,7 @@ Simple way to try out the YM2151 sound chip on the Commander X16
 
 ## What it does
 This is an X16 program "PLAYER.PRG" that will play music from a file called MUSIC.SP.
-Currently, MUSIC.SP is loaded into one bank of high ram, so the maximum supported file size is 8KB.
+Currently, MUSIC.SP is loaded into high ram, and it cycles through the banks, so MUSIC.SP must fit into however much high ram is available.
 To run the player you can do the following.
 > x16emu -prg PLAYER.PRG -run
 
