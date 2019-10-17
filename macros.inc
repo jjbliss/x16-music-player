@@ -110,3 +110,14 @@
 	lda #$1
 	sta VERA_irq
 }
+
+
+;MUSIC SPECIFIC
+
+!macro INC_MUSIC_POINTER {
+	+ADD_TO_16 MUSIC_POINTER, 1
+	bcc .imp_end
+	inc MEMORY_BANK
+.imp_end:
+
+}

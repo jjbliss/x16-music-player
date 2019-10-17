@@ -124,10 +124,10 @@ next_music:
 	beq .nm_done
 	sta Z0 ; number of commands to read
 .nm_loop:
-	+ADD_TO_16 MUSIC_POINTER, 1
+	+INC_MUSIC_POINTER
 	lda (MUSIC_POINTER),y
 	sta Z2
-	+ADD_TO_16 MUSIC_POINTER, 1
+	+INC_MUSIC_POINTER
 	lda (MUSIC_POINTER),y
 	sta Z3
 	jsr ym_add_buffer
@@ -135,10 +135,10 @@ next_music:
 	dec Z0
 	lda Z0
 	bne .nm_loop
-	+ADD_TO_16 MUSIC_POINTER, 1
+	+INC_MUSIC_POINTER
 	lda (MUSIC_POINTER),y
 	sta MUSIC_COUNTER
-	+ADD_TO_16 MUSIC_POINTER, 1
+	+INC_MUSIC_POINTER
 	rts
 .wait:
 	dec MUSIC_COUNTER
@@ -149,6 +149,7 @@ next_music:
 	sta MUSIC_POINTER
 	jsr reset_sound
 	rts
+
 
 reset_sound:
 	ldx #0
