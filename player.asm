@@ -68,12 +68,12 @@ setup_done:
 	rts
 
 wait:
-    ldy #DELAY_AMOUNT
+	ldy #DELAY_AMOUNT
 .busy_loop:
-    nop
-    dey
-    bne .busy_loop
-    rts
+	nop
+	dey
+	bne .busy_loop
+	rts
 
 ;=================================================
 ; irq_handler
