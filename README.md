@@ -15,9 +15,9 @@ Also included are python scripts spconvert.py and vspconvert.py.  These scripts 
 Here is a command to convert the included music.spt to MUSIC.SP
 >python3 spconvert.py -i music.spt -o MUSIC.SP -mode dec
 
->python3 spconvert.py -i veramusic.vspt -o MUSIC.VSP -mode dec
+>python3 spconvert.py -i veramusic.vspt -o MUSIC.VSP
 
-Noticed the -mode flag.  This can be set to hex or dec to read in numbers as either hexidecimal or decimal depending on what you would prefer.
+Noticed the -mode flag.  This can be set to hex or dec to read in numbers as either hexidecimal or decimal depending on what you would prefer.  This is only for the YM2151 version.  The VERA PSG converter always runs in decimal mode.
 
 ## Building and Running the Player
 
