@@ -19,7 +19,12 @@
     sta $0315
 }
 
-
+!macro SYS_RESTORE_IRQ {
+	lda irq_redirect
+    sta $0314
+	lda irq_redirect+1
+    sta $0315
+}
 ;=================================================
 ; SYS_WRITE_16
 ;   Stores a given 16-bit value to location.
@@ -37,6 +42,27 @@
   lda #>.value
   sta .dst+1
 }
+
+;=================================================
+; SYS_WRITE_24
+;   Stores a given 24-bit value to location.
+;-------------------------------------------------
+; INPUTS:
+;           .dst    Destination address
+;           .value   value to write
+;
+;-------------------------------------------------
+; MODIFIES: A, X, Y, $FB-$FF
+;
+!macro SYS_WRITE_24 .dst, .value {
+  lda #<.value
+  sta .dst
+  lda #>.value
+  sta .dst+1
+  lda #^.value
+  sta .dst+2
+}
+
 
 ;Math Macros
 
@@ -60,57 +86,25 @@
 }
 
 
-;VERA Macros
-
-!addr {
-	VERA_base = $9f20
-	VERA_addr_low   = VERA_base+0
-	VERA_addr_high  = VERA_base+1
-	VERA_addr_bank  = VERA_base+2
-	VERA_data       = VERA_base+3
-	VERA_data2      = VERA_base+4
-	VERA_ctrl       = VERA_base+5
-	VERA_irq_ctrl   = VERA_base+6
-	VERA_irq        = VERA_base+7
-
-	VRAM_composer = $F0000
-	VRAM_palette  = $F1000
-	VRAM_layer0   = $F2000
-	VRAM_layer1   = $F3000
-	VRAM_sprinfo  = $F4000
-	VRAM_sprdata  = $F5000
-
-	VROM_petscii = $1F000
-}
-
 ;=================================================
-; VERA_ENABLE_IRQ
-;   Set VERA to interrupt on VSYNC
+; ADD_A_TO_16
+;   Add to 16-bit data
 ;-------------------------------------------------
 ; INPUTS:   (none)
 ;
 ;-------------------------------------------------
-; MODIFIES: A
+; MODIFIES: $FF
 ;
-!macro VERA_ENABLE_IRQ {
-	lda #$1
-	sta VERA_irq_ctrl
+!macro ADD_A_TO_16 .address {
+    sta $FF
+    lda .address
+    clc
+    adc $FF
+    sta .address
+    lda .address+1
+    adc #0
+    sta .address+1
 }
-
-;=================================================
-; VERA_END_IRQ
-;   Reset the Vera IRQ flag so that it generates interrupts.
-;-------------------------------------------------
-; INPUTS:   (none)
-;
-;-------------------------------------------------
-; MODIFIES: A
-;
-!macro VERA_END_IRQ {
-	lda #$1
-	sta VERA_irq
-}
-
 
 ;MUSIC SPECIFIC
 
@@ -138,4 +132,62 @@
 	beq .bel1
 	jmp	.lbl
 .bel1:
+}
+
+
+!macro SYS_SET_RAM_BANK .value {
+	lda #.value
+	sta MEMORY_BANK
+}
+
+
+
+!macro SYS_COPY_FROM_IND_VARSIZE .src, .dst, .size {
+    lda .src ;.src to $FC $FB
+    sta $FB
+	lda .src+1
+    sta $FC
+    lda #<.dst ;.dst to $FE $FD
+    sta $FD
+    lda #>.dst
+    sta $FE
+
+	lda .size+1
+	beq .small
+.big:
+                    ; If we have at least 1 full page to copy, then include the
+                    ; page copy portion which needs a 5th byte to track the number
+                    ; of pages to copy.
+
+        lda .size+1 ; number of pages to copy
+        sta $FF
+
+        ldy #$00 ; reset y for our loop
+
+-       lda ($FB),Y ; indirect index source memory address
+        sta ($FD),Y ; indirect index dest memory address
+        iny
+        bne -       ; loop until our dest goes over 255
+
+        inc $FC     ; increment high order source memory address
+        inc $FE     ; increment high order dest memory address
+
+        dec $FF     ; decrement number of pages remaining
+        bne -       ; If we still have at least 1 page to copy, go back and copy it
+
+
+		lda .size
+		beq .end
+.small:
+                    ; If we're not copying exactly some number of pages, include
+                    ; the "copy the rest of it" section
+        ldy #0
+        ldx .size
+
+-       lda ($FB),Y
+        sta ($FD),Y
+        iny
+        dex
+        bne -
+.end:
 }

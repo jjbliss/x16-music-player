@@ -1,6 +1,7 @@
-!to "PLAYER.PRG", cbm
+!to "VERAPLAYER.PRG", cbm
 !cpu 65c02
 !src "macros.inc"
+!src "vera.inc"
 
 *=$0801
 	!byte $0b,$08,$01,$00,$9e,$32,$30,$36,$31,$00,$00,$00
@@ -13,6 +14,11 @@ Z1 = $01
 Z2 = $02
 Z3 = $03
 
+channel = $30
+pitch = $31 ;and  $32
+volume = $33
+wave = $34
+
 ;Address storage registers
 A0 = $10
 A1 = $12
@@ -22,15 +28,11 @@ A2 = $14
 MUSIC_COUNTER = $70 ; and $71
 MUSIC_POINTER = $72 ; and $73
 MUSIC_ON = $74
-YM2151_REG = $9fe0
-YM2151_DATA = $9fe1
+
+
 
 DELAY_AMOUNT = $20
 
-;Ring Buffer
-RINGBUFFER = $0500 ; choose a page of memory that is dedicated as a ring buffer
-RB_HEAD = $20
-RB_TAIL = $21
 
 ;Memory
 HIGH_RAM = $A000
@@ -61,10 +63,10 @@ setup_done:
 	lda MUSIC_ON
 	beq .end_program
 	jsr wait
-	jsr ym_write
 	jmp setup_done
 
 .end_program:
+	jsr reset_sound
 	rts
 
 wait:
@@ -110,8 +112,13 @@ music_setup:
 	;load file
 	+SYS_WRITE_16 A1, music_filename
 	+SYS_WRITE_16 A2, (music_filename - 1)
+	+SYS_SET_RAM_BANK 2
 	jsr load_from_file_to_highram
-	stz MEMORY_BANK
+
+	+SYS_SET_RAM_BANK 2
+	jsr reset_sound
+	lda #1
+	sta Z1
 	rts
 
 next_music:
@@ -121,19 +128,42 @@ next_music:
 	+BNE_LONG .wait
 	lda (MUSIC_POINTER)
 	+BEQ_LONG .nm_done
-	sta Z0 ; number of commands to read
+	sta Z0 ; number of channels to read
 .nm_loop:
 	+INC_MUSIC_POINTER
 	lda (MUSIC_POINTER)
-	sta Z2
+	sta channel
 	+INC_MUSIC_POINTER
 	lda (MUSIC_POINTER)
-	sta Z3
-	jsr ym_add_buffer
+	sta pitch
+	+INC_MUSIC_POINTER
+	lda (MUSIC_POINTER)
+	sta pitch+1
+	+INC_MUSIC_POINTER
+	lda (MUSIC_POINTER)
+	sta volume
+	+INC_MUSIC_POINTER
+	lda (MUSIC_POINTER)
+	sta wave
+
+	+SYS_WRITE_24 A0, VERA_psg
+	lda channel
+	asl
+	asl
+	+ADD_A_TO_16 A0
+	+VERA_SET_ADDR_IND A0, 1
+	lda pitch
+	sta VERA_data
+	lda pitch+1
+	sta VERA_data
+	lda volume
+	sta VERA_data
+	lda wave
+	sta VERA_data
 
 	dec Z0
 	lda Z0
-	bne .nm_loop
+	+BNE_LONG .nm_loop
 	+INC_MUSIC_POINTER
 	lda (MUSIC_POINTER)
 	sta MUSIC_COUNTER
@@ -147,90 +177,36 @@ next_music:
 	sta MUSIC_ON
 	sta MUSIC_POINTER
 	jsr reset_sound
+	+SYS_RESTORE_IRQ
 	rts
 
 
 reset_sound:
 	ldx #0
+	+VERA_SET_ADDR VERA_psg, 1
 .reset_loop:
-	jsr wait
-	stx YM2151_REG
-	nop ; real HW fails if you immediately write DATA after ADDRESS
-	stz YM2151_DATA
+	;jsr wait
+	stz VERA_data
+	stz VERA_data
+	stz VERA_data
+	stz VERA_data
 	inx
+	txa
+	cmp #16
 	bne .reset_loop
 .reset_end:
 	rts
 
-; Ring Buffer
-ym_write:
-	ldx RB_HEAD
-	cpx RB_TAIL
-	beq .ym_write_done
-	lda #$80
-.ym_wait:
-	and YM2151_DATA
-	bne .ym_wait
-	lda RINGBUFFER,X
-	sta YM2151_REG
-	inx
-	lda RINGBUFFER,X
-	sta YM2151_DATA
-	inx
-	stx RB_HEAD
-.ym_write_done:
-	rts
-
-;Will add Z2 and Z3 to buffer
-ym_add_buffer:
-	lda RB_TAIL
-	clc
-	adc #2 ; check if ring buffer is full
-	cmp RB_HEAD
-	beq .ym_buffer_done
-	sta RB_TAIL
-	sbc #2
-	tax
-	lda Z2
-	sta RINGBUFFER,x
-	inx
-	lda Z3
-	sta RINGBUFFER,x
-.ym_buffer_done:
-	rts
-
-;A1 should be pointing to filename
-;A2 should be pointing to filename length
-load_from_file_to_highram:
-	;$FFBA: SETLFS – set LA, FA and SA
-	lda #0 ; logical number (?)
-	ldx #1 ; device number
-	ldy #0 ; secondary address (?)
-	jsr SETLFS
-
-	;$FFBD: SETNAM – set filename
-	ldy #0
-	lda (A2),y
-	ldx A1
-	ldy A1+1
-	jsr SETNAM
-
-	lda Z1
-	sta MEMORY_BANK
-
-	lda #<HIGH_RAM
-	tax
-	lda #>HIGH_RAM
-	tay
-	lda #0
-	jsr LOAD
-
-	rts
 
 
-	!byte 8
+!src "fileio.asm"
+
+	!byte 9
 music_filename:
-	!pet "music.sp"
+	!pet "music.vsp"
+
+
+
 
 irq_redirect:
 	!fill 2
