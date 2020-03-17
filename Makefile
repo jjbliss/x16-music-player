@@ -13,7 +13,7 @@ MUSIC.SP: music.spt
 	python3 spconvert.py -i music.spt -o MUSIC.SP -mode dec
 
 MUSIC.VSP: veramusic.vspt
-	python3 vspconvert.py -i veramusic.vspt -o MUSIC.VSP -mode dec
+	python3 vspconvert.py -i veramusic.vspt -o MUSIC.VSP
 
 runym: all
 	$(X16EMU_PATH)/x16emu -prg PLAYER.PRG -run

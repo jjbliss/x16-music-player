@@ -1,35 +1,17 @@
 1 ; modify one channel
-0 ; PSG channel
-1181 		; Pitch
-0			; volume and LR channels off
-128 		; triangle wave
-100 ; wait for this many frames
-1	; modify 1 channel
-0 ; PSG channel
-1181 		; Pitch
-255			; Right left and full volume
-128 		; triangle wave
-255 ; wait for this many frames
-2 ; num channels this frame
-0 ; PSG channel
-1181 		; Pitch
-0			; off
-128 		; triangle wave
-1 ; channel
-2181 		; Pitch
-255			; volume and LR select
-128 		; wave
-255 ; wait for this many frames
-1 ; num channels this frame
-0 ; channel
-1181 		; Pitch
-255			; volume and LR select
-64 			; wave
-255 ; wait for this many frames
-1 ; num channels this frame
-0 ; channel
-1181 		; Pitch
-255			; volume and LR select
-128 		; wave
-255 ; wait for this many frames
-0 ; end file
+0:1181:N:0:2	;Channel 0, pitch = 1181, Neither left nor right channel, volume = 0, waveform 2 (triangle wave)
+100	;wait 100 frames
+1
+0:1181:LR:63:2
+255
+2
+0:1181:N:0:2:0
+1:2181:LR:63:2:0
+255
+1
+0:1181:LR:63:1
+255
+1
+0:1181:LR:63:0:22 ; waveform 0 gets additional number to represent pulse width
+255
+0 ; 0 channels to modify means end file
