@@ -7,12 +7,14 @@ There are two X16 programs "YMPLAYER.PRG" and "VERAPLAYER.PRG" that will play mu
 Currently, MUSIC.SP is loaded into high ram, and it cycles through the banks, so MUSIC.SP must fit into however much high ram is available.
 To run the player you can do the following.
 > x16emu -prg YMPLAYER.PRG -run
+
 or
 > x16emu -prg VERAPLAYER.PRG -run
 
 Also included are python scripts spconvert.py and vspconvert.py.  These scripts convert human readable text files, such as the included music.spt and veramusic.vspt files, into a file that can be read by the programs.
 Here is a command to convert the included music.spt to MUSIC.SP
 >python3 spconvert.py -i music.spt -o MUSIC.SP -mode dec
+
 >python3 spconvert.py -i veramusic.vspt -o MUSIC.VSP -mode dec
 
 Noticed the -mode flag.  This can be set to hex or dec to read in numbers as either hexidecimal or decimal depending on what you would prefer.
@@ -24,6 +26,7 @@ Running make should generate the program and test music files needed to run this
 
 There are additional options in the makefile to make things easier.  If you have the emulator in a folder called bin located in the parent directory of the player, the following will work to run the player.
 >make runym
+
 >make runvera
 
 ## File format
