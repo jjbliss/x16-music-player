@@ -1,25 +1,75 @@
-12	; write six things to YM2151
-32,	215	; write $D7 to reg $20
-40,	80	; write $50 to reg $28
-96,	7	; write $07 to reg $60
-128,24	; write $18 to reg $80
-224,5	; write $05 to reg $E0
-8,	8	; write $08 to reg $08
-33,	215	; now set up channel 1
-41,	80
-97,	7
-129,24
-225,5
-8,	9
-10	; wait 10 frames
-1	; read 1 command
-40, 244 ; write 244 to reg 40
-10	; wait 10 frames
-1	; read 1 command
-40, 100 ; write 100 to reg 40
-10	; wait 10 frames
-1	; read 1 command
-40, 244 ; write 244 to reg 40
-10	; wait 10 frames
-1	; read 1 command
+1
+32, 0
 0
+100
+6       ; First line is the number of YM2151 writes this frame.
+32, 215 ; This is a write to the YM2151, (REG, DATA)
+40, 80  ; write 80 to reg 40
+96, 7   ; write 7 to reg 96
+128, 24	; write 24 to reg 128
+224, 5	; write 5 to reg 224
+8, 8    ; write 8 to reg 8
+0		; Number of PSG writes this frame
+128     ; Since we have defined all writes for the first frame, this is the number of frames to delay before the next write
+1       ; Do 1 write to YM2151
+40, 244 ; write 244 to reg 40
+0		; Do 0 writes to PSG
+10      ; wait 10 frames
+1       ; Do 1 write
+40, 100 ; write 100 to reg 40
+0		; Do 0 writes to PSG
+10      ; wait 10 frames
+1       ; Do 1 write
+40, 244 ; write 244 to reg 40
+0		; Do 0 writes to PSG
+10      ; wait 10 frames
+1       ; Do 1 write
+40, 100 ; write 100 to reg 40
+0		; Do 0 writes to PSG
+10      ; wait 10 frames
+1       ; Do 1 write
+40, 244 ; write 244 to reg 40
+0		; Do 0 writes to PSG
+10      ; wait 10 frames
+1       ; Do 1 write
+40, 100 ; write 100 to reg 40
+0		; Do 0 writes to PSG
+10      ; wait 10 frames
+1       ; Do 1 write
+40, 244 ; write 244 to reg 40
+0		; Do 0 writes to PSG
+10      ; wait 10 frames
+1       ; Do 1 write
+40, 100 ; write 100 to reg 40
+0		; Do 0 writes to PSG
+10      ; wait 10 frames
+2		; write twice to YM2151
+40, 0	; Turn off channel 0
+41, 0	; Turn off channel 1
+0		; Write 0 times to PSG
+10		; wait 10 frames
+0		; Do 0 writes to YM2151
+4		; Do 4 writes to PSG
+0, 157	; Write 157 to low byte of channel 0 frequency
+1, 4	; write 4 to high byte of channel 0 frequency
+2, 255	; set channel 0 to full volume on L and R
+3, 128	; set channel 0 to triangle wave
+100		; wait 100 frames
+0		; Do 0 writes to YM2151
+1		; Do 1 write to PSG
+1, 1	; Write 1 to the high byte of channel 0 frequency
+20		; wait 20 frames
+0		; Do 0 writes to YM2151
+1		; Do 1 write to PSG
+1, 4	; Write 4 to the high byte of channel 0 frequency
+20		; wait 20 frames
+0		; Do 0 writes to YM2151
+1		; Do 1 write to PSG
+1, 1	; Write 1 to the high byte of channel 0 frequency
+20		; wait 20 frames
+0		; Do 0 writes to YM2151
+1		; Do 1 write to PSG
+1, 4	; Write 4 to the high byte of channel 0 frequency
+20		; wait 20 frames
+0       ; Do 0 writes to YM2151
+0		; Do 0 writes to PSG, this is interpreted as end of file when 0 writes is done to each

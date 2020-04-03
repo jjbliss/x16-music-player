@@ -1,7 +1,8 @@
-!to "VERAPLAYER.PRG", cbm
+!to "PLAYER.PRG", cbm
 !cpu 65c02
 !src "macros.inc"
 !src "vera.inc"
+
 
 *=$0801
 	!byte $0b,$08,$01,$00,$9e,$32,$30,$36,$31,$00,$00,$00
@@ -14,10 +15,10 @@ Z1 = $01
 Z2 = $02
 Z3 = $03
 
-channel = $30
-pitch = $31 ;and  $32
-volume = $33
-wave = $34
+; channel = $30
+; pitch = $31 ;and  $32
+; volume = $33
+; wave = $34
 
 ;Address storage registers
 A0 = $10
@@ -29,10 +30,16 @@ MUSIC_COUNTER = $70 ; and $71
 MUSIC_POINTER = $72 ; and $73
 MUSIC_ON = $74
 
+YM2151_REG = $9fe0
+YM2151_DATA = $9fe1
+
+DELAY_AMOUNT = $05
 
 
-DELAY_AMOUNT = $20
-
+;Ring Buffer
+RINGBUFFER = $0500 ; choose a page of memory that is dedicated as a ring buffer
+RB_HEAD = $20
+RB_TAIL = $21
 
 ;Memory
 HIGH_RAM = $A000
@@ -44,6 +51,9 @@ SAVE = $FFD8
 SETLFS = $FFBA
 SETNAM = $FFBD
 
+;
+PSG_ZERO_FRAMES = $90
+YM_ZERO_FRAMES = $91
 
 
 ;=================================================
@@ -63,6 +73,7 @@ setup_done:
 	lda MUSIC_ON
 	beq .end_program
 	jsr wait
+	jsr ym_write
 	jmp setup_done
 
 .end_program:
@@ -105,6 +116,8 @@ irq_handler:
 
 music_setup:
 	lda #0
+	sta PSG_ZERO_FRAMES
+	sta YM_ZERO_FRAMES
 	sta MUSIC_COUNTER
 	+SYS_WRITE_16 MUSIC_POINTER, HIGH_RAM
 	lda #1
@@ -126,44 +139,12 @@ next_music:
 	+BEQ_LONG .nm_done
 	lda MUSIC_COUNTER
 	+BNE_LONG .wait
-	lda (MUSIC_POINTER)
-	+BEQ_LONG .nm_done
-	sta Z0 ; number of channels to read
-.nm_loop:
+	jsr ym_frame
 	+INC_MUSIC_POINTER
-	lda (MUSIC_POINTER)
-	sta channel
-	+INC_MUSIC_POINTER
-	lda (MUSIC_POINTER)
-	sta pitch
-	+INC_MUSIC_POINTER
-	lda (MUSIC_POINTER)
-	sta pitch+1
-	+INC_MUSIC_POINTER
-	lda (MUSIC_POINTER)
-	sta volume
-	+INC_MUSIC_POINTER
-	lda (MUSIC_POINTER)
-	sta wave
-
-	+SYS_WRITE_24 A0, VERA_psg
-	lda channel
-	asl
-	asl
-	+ADD_A_TO_16 A0
-	+VERA_SET_ADDR_IND A0, 1
-	lda pitch
-	sta VERA_data
-	lda pitch+1
-	sta VERA_data
-	lda volume
-	sta VERA_data
-	lda wave
-	sta VERA_data
-
-	dec Z0
-	lda Z0
-	+BNE_LONG .nm_loop
+	jsr psg_frame
+	lda PSG_ZERO_FRAMES
+ 	and YM_ZERO_FRAMES
+	bne .nm_done
 	+INC_MUSIC_POINTER
 	lda (MUSIC_POINTER)
 	sta MUSIC_COUNTER
@@ -182,28 +163,18 @@ next_music:
 
 
 reset_sound:
-	ldx #0
-	+VERA_SET_ADDR VERA_psg, 1
-.reset_loop:
-	;jsr wait
-	stz VERA_data
-	stz VERA_data
-	stz VERA_data
-	stz VERA_data
-	inx
-	txa
-	cmp #16
-	bne .reset_loop
-.reset_end:
+	jsr ym_reset
+	jsr psg_reset
 	rts
 
-
+!src "psg.asm"
+!src "ym2151.asm"
 
 !src "fileio.asm"
 
-	!byte 9
+	!byte 8
 music_filename:
-	!pet "music.vsp"
+	!pet "music.sp"
 
 
 
