@@ -10,10 +10,10 @@
 
 ;ZeroPage registers
 ;assume that these are very volatile
-Z0 = $00
-Z1 = $01
-Z2 = $02
-Z3 = $03
+Z0 = $02
+Z1 = $03
+Z2 = $04
+Z3 = $05
 
 ; channel = $30
 ; pitch = $31 ;and  $32
@@ -30,20 +30,20 @@ MUSIC_COUNTER = $70 ; and $71
 MUSIC_POINTER = $72 ; and $73
 MUSIC_ON = $74
 
-YM2151_REG = $9fe0
-YM2151_DATA = $9fe1
+YM2151_REG = $9f40
+YM2151_DATA = $9f41
 
 DELAY_AMOUNT = $05
 
 
 ;Ring Buffer
 RINGBUFFER = $0500 ; choose a page of memory that is dedicated as a ring buffer
-RB_HEAD = $20
-RB_TAIL = $21
+RB_HEAD = $75
+RB_TAIL = $76
 
 ;Memory
 HIGH_RAM = $A000
-MEMORY_BANK = $9F61
+MEMORY_BANK = $0000
 
 ;Routines
 LOAD = $FFD5
